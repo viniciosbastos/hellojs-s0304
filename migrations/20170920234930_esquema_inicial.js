@@ -1,4 +1,3 @@
-// 20170919140032_esquema_inicial.js
 exports.up = knex => knex.schema.createTable("evento", tb => {
     tb.increments("idevento")
     tb.string("tituloevento").notNullable()

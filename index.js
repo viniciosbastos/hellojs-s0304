@@ -3,6 +3,10 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 
+const axios = require("axios")
+
+issueRequest = require('./issue_request')
+
 app.use(express.static('public'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({
@@ -23,6 +27,45 @@ app.post('/dosave', (req, res) => {
     <a href="index2.html">voltar</a>
   `)
 })
+
+app.post('/presenca', (req, res) => {
+    let data = req.body.repo
+
+    if (data) {
+        data = data.toUpperCase()
+        issueRequest.getByRepo(data).then(ret => insert(ret))
+    } else {
+        data = req.body.issue
+        issueRequest.getByIssue(data).then(ret => insert(ret))
+    }
+})
+
+app.get('/presenca', (req, res) => {
+    knex('presenca').select().then(ret => {
+        res.send(ret)
+    })
+})
+
+insert = (users) => {
+    if (users.length > 0) {
+        users.forEach(user => {
+            knex('presenca').select().where({
+                usuario: user.usuario,
+                episodio: user.episodio
+            }).then(ret => {
+                if (!ret.length) {
+                    knex('presenca').insert(user).then(_ => {
+                        console.log('Dados inseridos na tabela.')
+                    }).catch(err => {
+                        console.log(err)
+                    })
+                }
+            }).catch(err => {
+                console.log(err)
+            })
+        })
+    }
+}
 
 knex.migrate.latest().then(_ => {
     console.log('Schema do banco atualizado.')

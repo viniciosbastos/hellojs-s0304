@@ -1,0 +1,65 @@
+<html>
+
+<head>
+    <title>Desafio S03E04</title>
+</head>
+
+<body>
+    <form>
+        <div style="display: block; padding: 10px;">
+            <label for="repo">Repositório</label>
+            <input type="text" id="repo" name="repo" />
+        </div>
+        <div style="display: block; padding: 10px;">
+            <label for="issue">Issue</label>
+            <input type="number" id="issue" name="issue" />
+        </div>
+    </form>
+    <button onclick="clicked()">Click Me</button>
+    <button onclick="show()">Mostrar Presença</button>
+
+
+    <script>
+        function clicked() {
+            const form = document.forms[0]
+            const repo = form['repo'].value
+            const issue = form['issue'].value
+            const toSend = {}
+
+            if (repo) {
+                toSend.repo = repo
+            } else {
+                toSend.issue = issue
+            }
+
+            console.log(toSend)
+            fetch("/presenca", {
+                method: "POST",
+                headers: new Headers({
+                    "Content-Type": "application/json"
+                }),
+                body: JSON.stringify(toSend)
+            }).then(response => {
+                return response.text()
+            }).then(ret => {
+                console.log(ret)
+            })
+
+        }
+
+        function show() {
+            fetch("/presenca", {
+                method: "GET",
+                headers: new Headers({
+                    "Content-Type": "application/json"
+                })                
+            }).then(response => {
+                return response.text()
+            }).then(ret => {
+                console.log(ret)
+            })
+        }
+    </script>
+</body>
+
+</html>
